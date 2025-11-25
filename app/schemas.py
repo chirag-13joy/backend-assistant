@@ -9,7 +9,7 @@ class StudyTopicInput(BaseModel):
     weight: Literal["low", "medium", "high"]
     weakness: Literal["strong", "moderate", "weak"]
     progress: float
-    base_hours: int
+    base_hours: float
 
 class TopicsRequest(BaseModel):
     user_id: str
