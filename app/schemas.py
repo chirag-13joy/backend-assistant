@@ -32,14 +32,14 @@ class PracticeRequest(BaseModel):
 class StudyPlanModule(BaseModel):
     module_title: str
     description: str
-    estimated_time_minutes: int
+    estimated_time_minutes: float
     resources: List[str]
 
 class StudyPlanResponse(BaseModel):
     plan_id: str
     user_id: str
     title: str
-    estimated_duration_hours: int
+    estimated_duration_hours: float
     modules: List[StudyPlanModule]
 
 class TeacherResponse(BaseModel):
