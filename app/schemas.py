@@ -6,7 +6,7 @@ class TopicsRequest(BaseModel):
     user_id: str
     study_level: Literal["beginner", "intermediate", "advanced"]
     subjects: List[str]
-    duration_hours: int
+    duration_hours: float
 
 class TeacherRequest(BaseModel):
     user_id: str
