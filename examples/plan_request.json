@@ -1,6 +1,7 @@
 {
-    "user_id": "user123",
-    "duration_hours": 10.5,
+    "start_date": "2025-12-01",
+    "exam_date": "2025-12-21",
+    "hours_per_day": 3.5,
     "topics": [
         {
             "subject_name": "DBMS",
@@ -9,7 +10,7 @@
             "weight": "high",
             "weakness": "weak",
             "progress": 0.2,
-            "base_hours": 4
+            "base_hours": 4.5
         },
         {
             "subject_name": "DBMS",
@@ -27,7 +28,7 @@
             "weight": "medium",
             "weakness": "strong",
             "progress": 0.8,
-            "base_hours": 2
+            "base_hours": 2.5
         }
     ]
 }

@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
+from datetime import date
 
 # Input JSONs
 class StudyTopicInput(BaseModel):
@@ -8,13 +9,14 @@ class StudyTopicInput(BaseModel):
     difficulty: Literal["easy", "medium", "hard"]
     weight: Literal["low", "medium", "high"]
     weakness: Literal["strong", "moderate", "weak"]
-    progress: float
+    progress: float = Field(..., ge=0, le=1) # Progress between 0.0 and 1.0
     base_hours: float
 
-class TopicsRequest(BaseModel):
-    user_id: str
+class PlannerRequest(BaseModel):
     topics: List[StudyTopicInput]
-    duration_hours: float
+    start_date: date
+    exam_date: date
+    hours_per_day: float = Field(..., gt=0) # Must be greater than 0
 
 class TeacherRequest(BaseModel):
     user_id: str
