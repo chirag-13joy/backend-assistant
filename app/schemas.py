@@ -2,10 +2,18 @@ from pydantic import BaseModel
 from typing import List, Literal, Optional
 
 # Input JSONs
+class StudyTopicInput(BaseModel):
+    subject_name: str
+    topic_name: str
+    difficulty: Literal["easy", "medium", "hard"]
+    weight: Literal["low", "medium", "high"]
+    weakness: Literal["strong", "moderate", "weak"]
+    progress: float
+    base_hours: int
+
 class TopicsRequest(BaseModel):
     user_id: str
-    study_level: Literal["beginner", "intermediate", "advanced"]
-    subjects: List[str]
+    topics: List[StudyTopicInput]
     duration_hours: float
 
 class TeacherRequest(BaseModel):

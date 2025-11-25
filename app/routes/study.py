@@ -6,24 +6,25 @@ router = APIRouter()
 
 @router.post("/plan", response_model=StudyPlanResponse)
 async def create_study_plan(request: TopicsRequest):
-    # Placeholder for AI model integration to generate a study plan
-    # This is where you would call the Gemini Pro model
-    # For now, we return a dummy response
+    subjects_in_plan = list(set([topic.subject_name for topic in request.topics]))
+    plan_title = f"Study Plan for {', '.join(subjects_in_plan)}"
+
+    dummy_modules = []
+    for topic_input in request.topics:
+        dummy_modules.append({
+            "module_title": f"{topic_input.subject_name}: {topic_input.topic_name}",
+            "description": f"Review of {topic_input.topic_name} with difficulty: {topic_input.difficulty} and weakness: {topic_input.weakness}.",
+            "estimated_time_minutes": topic_input.base_hours * 60, # Convert hours to minutes
+            "resources": [f"Resources for {topic_input.topic_name}", "Additional materials"]
+        })
+
     dummy_plan = StudyPlanResponse(
         plan_id="dummy_plan_id_123",
         user_id=request.user_id,
-        title=f"Study Plan for {', '.join(request.subjects)}",
+        title=plan_title,
         estimated_duration_hours=request.duration_hours,
-        modules=[
-            {
-                "module_title": "Introduction to " + request.subjects[0],
-                "description": "Overview of key concepts.",
-                "estimated_time_minutes": 60,
-                "resources": ["Recommended reading", "Video tutorial"]
-            }
-        ]
+        modules=dummy_modules
     )
-    return dummy_plan
 
 @router.post("/explain", response_model=TeacherResponse)
 async def get_explanation(request: TeacherRequest):

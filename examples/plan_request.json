@@ -1,6 +1,33 @@
 {
     "user_id": "user123",
-    "study_level": "intermediate",
-    "subjects": ["Physics", "Mathematics"],
-    "duration_hours": 10
+    "duration_hours": 10.5,
+    "topics": [
+        {
+            "subject_name": "DBMS",
+            "topic_name": "Normalization",
+            "difficulty": "hard",
+            "weight": "high",
+            "weakness": "weak",
+            "progress": 0.2,
+            "base_hours": 4
+        },
+        {
+            "subject_name": "DBMS",
+            "topic_name": "ER Diagrams",
+            "difficulty": "medium",
+            "weight": "medium",
+            "weakness": "moderate",
+            "progress": 0.5,
+            "base_hours": 3
+        },
+        {
+            "subject_name": "DSA",
+            "topic_name": "Arrays",
+            "difficulty": "easy",
+            "weight": "medium",
+            "weakness": "strong",
+            "progress": 0.8,
+            "base_hours": 2
+        }
+    ]
 }
