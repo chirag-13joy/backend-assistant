@@ -1,0 +1,6 @@
+{
+    "user_id": "user123",
+    "study_level": "intermediate",
+    "subjects": ["Physics", "Mathematics"],
+    "duration_hours": 10
+}

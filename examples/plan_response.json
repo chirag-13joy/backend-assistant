@@ -1,0 +1,20 @@
+{
+    "plan_id": "plan456",
+    "user_id": "user123",
+    "title": "10-Hour Physics & Math Study Plan",
+    "estimated_duration_hours": 10,
+    "modules": [
+        {
+            "module_title": "Physics: Kinematics",
+            "description": "Review of motion in one and two dimensions.",
+            "estimated_time_minutes": 120,
+            "resources": ["Textbook Chapter 2", "Online Lecture 1"]
+        },
+        {
+            "module_title": "Mathematics: Calculus Basics",
+            "description": "Introduction to derivatives and integrals.",
+            "estimated_time_minutes": 240,
+            "resources": ["Textbook Chapter 3", "Khan Academy Videos"]
+        }
+    ]
+}
