@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 
 # Import routers
-from app.routes import planner # Import the new planner router
+from app.routes import planner, scheduler, study_plan # Import the new planner and scheduler router
 
 load_dotenv()
 
@@ -25,6 +25,8 @@ async def read_root():
 
 # Include the new planner router
 app.include_router(planner.router, prefix="/planner", tags=["Planner"])
+app.include_router(scheduler.router, prefix="/scheduler", tags=["Scheduler"])
+app.include_router(study_plan.router, prefix="/study_plan", tags=["Study Plan"])
 
 # Placeholder for other routers like /teacher, /practice etc.
 # app.include_router(teacher.router, prefix="/teacher", tags=["Teacher Mode"])

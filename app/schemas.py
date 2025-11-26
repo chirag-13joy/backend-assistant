@@ -18,6 +18,10 @@ class PlannerRequest(BaseModel):
     exam_date: date
     hours_per_day: float = Field(..., gt=0) # Must be greater than 0
 
+class StudyPlanRequest(PlannerRequest):
+    pass
+
+
 class TeacherRequest(BaseModel):
     user_id: str
     topic: str
@@ -31,18 +35,18 @@ class PracticeRequest(BaseModel):
     difficulty: Literal["easy", "medium", "hard"]
 
 # Output JSONs
-class StudyPlanModule(BaseModel):
+class StudyPlannerModule(BaseModel):
     module_title: str
     description: str
     estimated_time_minutes: float
     resources: List[str]
 
-class StudyPlanResponse(BaseModel):
+class StudyPlannerResponse(BaseModel):
     plan_id: str
     user_id: str
     title: str
     estimated_duration_hours: float
-    modules: List[StudyPlanModule]
+    modules: List[StudyPlannerModule]
 
 class TeacherResponse(BaseModel):
     user_id: str
@@ -57,3 +61,24 @@ class PracticeResponse(BaseModel):
     options: List[str]
     correct_answer: str
     explanation: str
+
+
+# Scheduler-related output models
+class Task(BaseModel):
+    topic_name: str
+    subject_name: str
+    task_type: str
+    duration_hours: float
+    priority_score: float
+
+class PlanDay(BaseModel):
+    date: date
+    tasks: List[Task]
+    total_hours: float
+
+class StudyPlanResponse(BaseModel):
+    days: List[PlanDay]
+    start_date: date
+    exam_date: date
+    hours_per_day: float
+    status: str
