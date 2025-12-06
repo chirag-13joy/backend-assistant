@@ -1,13 +1,7 @@
-import os
-import sys
-
-# Allow importing Scheduler.py from parent directory if this lives in modes/
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
 from typing import Any, Dict, List, Optional
 import json
 
-from Scheduler import (
+from app.logic.scheduler import (
     Topic,
     compute_priority_score,
     estimate_required_hours,
@@ -380,7 +374,21 @@ def revision_llm_request(
     session_state:
       - should contain "topics": List[Topic]
     """
-    topics: List[Topic] = session_state.get("topics") or []
+    raw_topics = session_state.get("topics") or []
+    topics: List[Topic] = []
+    for t in raw_topics:
+        if isinstance(t, dict):
+            topics.append(Topic(
+                name=t.get("topic_name", ""),
+                subject_name=t.get("subject_name", ""),
+                weight=t.get("weight", "medium"),
+                difficulty=t.get("difficulty", "medium"),
+                weakness=t.get("weakness", "moderate"),
+                progress=t.get("progress", 0.0),
+                base_hours=t.get("base_hours", 2.0)
+            ))
+        else:
+            topics.append(t)
     action = (action or "").strip().lower()
 
     if action == "revision_points":
@@ -431,5 +439,32 @@ def revision_llm_request(
             topic_name=topic_name,
             count=count,
         )
+
+    if action == "generate_revision_plan":
+        # This maps to high_yield_topics but formatted for the frontend
+        fraction = float(payload.get("fraction", 0.5))
+        min_count = int(payload.get("min_count", 3))
+        
+        high_yield_result = select_high_yield_topics(
+            topics=topics,
+            fraction=fraction,
+            min_count=min_count,
+        )
+        
+        # Transform for frontend
+        revision_topics = []
+        for item in high_yield_result.get("topics", []):
+            t_dict = item.get("topic", {})
+            revision_topics.append({
+                "subject": t_dict.get("subject_name", "Unknown"),
+                "topic": t_dict.get("topic_name", "Unknown"),
+                "weakness": t_dict.get("weakness", "moderate"),
+                "priority": f"Score: {item.get('priority_score', 0):.2f}"
+            })
+            
+        return {
+            "kind": "revision_plan",
+            "revision_topics": revision_topics
+        }
 
     return {"error": True, "reason": f"unknown_revision_action: {action}"}

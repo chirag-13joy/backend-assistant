@@ -1,14 +1,9 @@
-import os
-import sys
-
-sys.path.append(os.path.dirname(__file__))
-
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional
 import json
 from datetime import datetime
 
-from Scheduler import Topic  # uses your existing Scheduler.py
+from app.logic.scheduler import Topic
 
 
 # =========================
@@ -347,7 +342,21 @@ def practice_llm_request(
     payload: Dict[str, Any],
     session_state: Dict[str, Any],
 ) -> Dict[str, Any]:
-    topics: List[Topic] = session_state.get("topics") or []
+    raw_topics = session_state.get("topics") or []
+    topics: List[Topic] = []
+    for t in raw_topics:
+        if isinstance(t, dict):
+            topics.append(Topic(
+                name=t.get("topic_name", ""),
+                subject_name=t.get("subject_name", ""),
+                weight=t.get("weight", "medium"),
+                difficulty=t.get("difficulty", "medium"),
+                weakness=t.get("weakness", "moderate"),
+                progress=t.get("progress", 0.0),
+                base_hours=t.get("base_hours", 2.0)
+            ))
+        else:
+            topics.append(t)
 
     # Ensure practice_stats is always a dict stored back into session_state
     performance_store = session_state.get("practice_stats")
@@ -427,5 +436,9 @@ def practice_llm_request(
             "topic_name": topic_name,
             "difficulty": difficulty,
         }
+
+    if action == "start_practice":
+        payload["count"] = payload.get("num_questions", 5)
+        return practice_llm_request("generate_questions", payload, session_state)
 
     return {"error": True, "reason": f"unknown_practice_action: {action}"}

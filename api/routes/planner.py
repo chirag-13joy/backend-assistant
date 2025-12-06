@@ -3,30 +3,27 @@ from pydantic import BaseModel
 from typing import List
 from datetime import date
 
-# Assuming the logic is in the app directory, and we can import it.
-# We might need to adjust the Python path for this to work.
-import sys
-sys.path.append('/mnt/c/Users/Lenovo/ai_study_assistant_backend')
 from app.logic.scheduler import build_topics_from_payload, generate_study_plan, study_plan_to_dict
-from app.models.study_plan import StudyTopic, StudyPlan
 
 
 router = APIRouter()
 
+from typing import List, Dict, Any
+
 class PlannerRequest(BaseModel):
-    topics: List[str]
+    topics: List[Dict[str, Any]]
     start_date: date
     exam_date: date
     hours_per_day: float
 
-@router.post("/generate-plan")
+@router.post("/generate_study_plan")
 async def generate_plan(request: PlannerRequest):
     """
     Generates a study plan based on a list of topics, a start date, an exam date, and the number of hours per day.
     """
     try:
         # 1. Build topics from the payload
-        topic_objects = build_topics_from_payload([{"topic_name": name, "subject_name": "General", "difficulty": "medium", "weight": "medium", "weakness": "moderate"} for name in request.topics])
+        topic_objects = build_topics_from_payload(request.topics)
 
         # 2. Generate the study plan
         study_plan = generate_study_plan(

@@ -16,31 +16,19 @@ sessions: Dict[str, Dict[str, Any]] = {}
 class TeacherRequest(BaseModel):
     action: str
     payload: Dict[str, Any]
-    session_id: str
+    session_state: Dict[str, Any]
 
-@router.post("/action")
+@router.post("/")
 async def teacher_action(request: TeacherRequest):
     """
     Routes requests to the appropriate teacher mode function.
     """
-    session_id = request.session_id
-    if session_id not in sessions:
-        # A session should exist, with topics and a plan.
-        # For now, let's create a dummy one for testing.
-        dummy_topics = build_topics_from_payload([
-            {"topic_name": "Normalization", "subject_name": "Databases", "difficulty": "medium", "weight": "high", "weakness": "weak"},
-            {"topic_name": "SQL Joins", "subject_name": "Databases", "difficulty": "hard", "weight": "high", "weakness": "moderate"}
-        ])
-        sessions[session_id] = {"topics": dummy_topics, "plan": None}
-
-    session_state = sessions[session_id]
-
     # The teacher_llm_request returns a dictionary that is a request for an LLM
     # We will just return that dictionary for now.
     llm_request = teacher_llm_request(
         action=request.action,
         payload=request.payload,
-        session_state=session_state
+        session_state=request.session_state
     )
 
     if llm_request.get("error"):

@@ -1,8 +1,17 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from .routes import planner, assistant, teacher, practice, revision
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -11,7 +20,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"error": True, "message": f"An unexpected error occurred: {exc}"},
     )
 
-app.include_router(planner.router, prefix="/planner")
+app.include_router(planner.router, prefix="/study_plan")
 app.include_router(assistant.router, prefix="/assistant")
 app.include_router(teacher.router, prefix="/teacher")
 app.include_router(practice.router, prefix="/practice")

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 # Import routers
-from app.routes import planner, scheduler, study_plan, teacher # Import the new planner and scheduler router
+from app.routes import planner, scheduler, study_plan, teacher, practice, revision, exam
 
 load_dotenv()
 
@@ -25,8 +25,9 @@ app = FastAPI(
 origins = [
     "http://localhost",
     "http://localhost:8000",
-    "http://localhost:8080", # Assuming your frontend might run on 8080 or similar
-    "null", # For local file access
+    "http://localhost:8080",
+    "null",
+    "*"
 ]
 
 app.add_middleware(
@@ -41,12 +42,16 @@ app.add_middleware(
 async def read_root():
     return {"message": "Welcome to the AI Study Assistant API!"}
 
-# Include the new planner router
-app.include_router(planner.router, prefix="/planner", tags=["Planner"])
-app.include_router(scheduler.router, prefix="/scheduler", tags=["Scheduler"])
-app.include_router(study_plan.router, prefix="/study_plan", tags=["Study Plan"])
+@app.get("/ping")
+async def ping():
+    return {"status": "ok"}
 
-# Placeholder for other routers like /teacher, /practice etc.
+# Include routers
+app.include_router(planner.router, prefix="/study_plan", tags=["Planner"])
+app.include_router(scheduler.router, prefix="/scheduler", tags=["Scheduler"])
+# app.include_router(study_plan.router, prefix="/study_plan_old", tags=["Study Plan Old"]) # Commenting out old one if needed
 app.include_router(teacher.router, prefix="/teacher", tags=["Teacher Mode"])
-# app.include_router(practice.router, prefix="/practice", tags=["Practice Mode"])
+app.include_router(practice.router, prefix="/practice", tags=["Practice Mode"])
+app.include_router(revision.router, prefix="/revision", tags=["Revision Mode"])
+app.include_router(exam.router, prefix="/exam", tags=["Exam Strategy"])
 

@@ -157,7 +157,8 @@
 
         #response,
         #teacherResponse,
-        #practiceResponse {
+        #practiceResponse,
+        #studyPlanDisplay {
             margin-top: 30px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -231,6 +232,86 @@
         .tab-button:hover:not(.active) {
             background-color: #e0e2e5;
             color: #333;
+        }
+
+        /* Styles for Study Plan Display */
+        .study-plan-day {
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden; /* Needed for collapsible effect */
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .study-plan-day-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .study-plan-day-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .study-plan-day-header .toggle-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .study-plan-day.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .study-plan-day-content {
+            padding: 20px;
+            display: none; /* Hidden by default */
+        }
+
+        .study-plan-day.expanded .study-plan-day-content {
+            display: block; /* Shown when expanded */
+        }
+
+        .task-card {
+            background-color: #fdfdfd;
+            border: 1px solid #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .task-card-details {
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+
+        .task-card-details p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .task-card-details p strong {
+            color: #555;
+        }
+
+        .task-card-duration {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1em;
+            background-color: #eaf5ff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -322,6 +403,14 @@
 
             <h2>Response</h2>
             <pre id="response"></pre>
+            
+            <!-- Study Plan Display Area -->
+            <div id="studyPlanDisplay" style="display: none;"> <!-- Initially hidden -->
+                <h2>Your Study Plan</h2>
+                <div id="studyPlanContent">
+                    <p>Generate a study plan to see your schedule here.</p>
+                </div>
+            </div>
         </div>
 
         <div id="teacherTab" class="tab-content">
@@ -380,12 +469,14 @@
         let sessionTopics = []; // To store topics for Teacher/Practice modes
         let currentStudyPlan = null; // To store the generated study plan
 
+        // --- Event Listeners ---
         document.getElementById('addTopic').addEventListener('click', addTopic);
         document.getElementById('generatePlan').addEventListener('click', generatePlan);
         document.getElementById('checkBackend').addEventListener('click', checkBackend);
         document.getElementById('executeTeacherAction').addEventListener('click', executeTeacherAction);
         document.getElementById('teacherAction').addEventListener('change', toggleTeacherFormFields);
 
+        // --- Tab Functionality ---
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -403,25 +494,16 @@
             }
         }
 
-        // Overwrite the previous showTab to handle the nav links as well
-        const navLinks = document.querySelectorAll('.navbar nav a');
-        navLinks.forEach(link => {
+        // Add event listeners to navigation links
+        document.querySelectorAll('.navbar nav a').forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault();
                 const tabId = link.getAttribute('onclick').match(/'(.*?)'/)[1];
-
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                document.getElementById(tabId + 'Tab').classList.add('active');
-
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                const activeButton = Array.from(document.querySelectorAll('.tab-button')).find(btn => btn.getAttribute('onclick').includes(`'${tabId}'`));
-                if (activeButton) {
-                    activeButton.classList.add('active');
-                }
+                showTab(tabId);
             });
         });
 
-
+        // --- Topic Management ---
         function addTopic() {
             const container = document.getElementById('topicsContainer');
             const newTopicGroup = document.createElement('div');
@@ -478,16 +560,16 @@
             const topicToRemove = document.getElementById(`topic-${id}`);
             if (topicToRemove) {
                 topicToRemove.remove();
-                // Rebuild sessionTopics after removing a topic
-                updateSessionTopics();
+                updateSessionTopics(); // Rebuild sessionTopics after removing a topic
             }
         }
 
         function updateSessionTopics() {
             sessionTopics = [];
+            // Loop through all potential topic IDs
             for (let i = 0; i < topicCount; i++) {
                 const topicGroup = document.getElementById(`topic-${i}`);
-                if (topicGroup) {
+                if (topicGroup) { // Check if the topic group element still exists
                     sessionTopics.push({
                         topic_name: document.getElementById(`topicName-${i}`).value,
                         subject_name: document.getElementById(`subjectName-${i}`).value,
@@ -501,6 +583,7 @@
             }
         }
 
+        // --- Backend Communication ---
         async function checkBackend() {
             const responseDiv = document.getElementById('response');
             responseDiv.innerHTML = 'Checking backend health...';
@@ -534,7 +617,7 @@
                 start_date: startDate,
                 exam_date: examDate,
                 hours_per_day: hoursPerDay,
-                topics: sessionTopics, // Use sessionTopics for the payload
+                topics: sessionTopics,
             };
 
             try {
@@ -557,6 +640,8 @@
                 const data = await response.json();
                 currentStudyPlan = data; // Store the generated plan
                 responseDiv.textContent = JSON.stringify(data, null, 2);
+                renderStudyPlan(data); // Render the generated plan
+                document.getElementById('studyPlanDisplay').style.display = 'block'; // Show the plan display area
             } catch (error) {
                 console.error('Error generating study plan:', error);
                 responseDiv.textContent = `Error: ${error.message}`;
@@ -564,6 +649,69 @@
             }
         }
 
+        function renderStudyPlan(plan) {
+            const studyPlanContentDiv = document.getElementById('studyPlanContent');
+            studyPlanContentDiv.innerHTML = ''; // Clear previous content
+
+            if (!plan || !plan.plan_by_day || plan.plan_by_day.length === 0) {
+                studyPlanContentDiv.innerHTML = '<p>No study plan available or the plan is empty. Please generate a plan first.</p>';
+                return;
+            }
+
+            plan.plan_by_day.forEach((dayData, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('study-plan-day');
+                dayDiv.classList.add('collapsed'); // Start collapsed
+                dayDiv.innerHTML = `
+                    <div class="study-plan-day-header" onclick="toggleDay(${index})">
+                        <span>${dayData.date} - Total Hours: ${dayData.total_hours.toFixed(2)}</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="study-plan-day-content">
+                        <!-- Tasks will be appended here -->
+                    </div>
+                `;
+
+                const dayContentDiv = dayDiv.querySelector('.study-plan-day-content');
+                if (dayData.tasks && dayData.tasks.length > 0) {
+                    dayData.tasks.forEach(task => {
+                        const taskCard = document.createElement('div');
+                        taskCard.classList.add('task-card');
+                        taskCard.innerHTML = `
+                            <div class="task-card-details">
+                                <p><strong>Subject:</strong> ${task.subject}</p>
+                                <p><strong>Topic:</strong> ${task.topic}</p>
+                                <p><strong>Type:</strong> ${task.type}</p>
+                            </div>
+                            <div class="task-card-duration">${task.duration.toFixed(2)} hrs</div>
+                        `;
+                        dayContentDiv.appendChild(taskCard);
+                    });
+                } else {
+                    dayContentDiv.innerHTML = '<p>No tasks scheduled for this day.</p>';
+                }
+                studyPlanContentDiv.appendChild(dayDiv);
+            });
+        }
+
+        function toggleDay(index) {
+            // Find the specific day div based on its index/order
+            // Using querySelectorAll and then selecting by index ensures we get the correct one
+            const allDayDivs = document.querySelectorAll('.study-plan-day');
+            if (index >= 0 && index < allDayDivs.length) {
+                const dayDiv = allDayDivs[index];
+                dayDiv.classList.toggle('collapsed');
+                dayDiv.classList.toggle('expanded');
+                
+                // Update the toggle icon
+                const toggleIcon = dayDiv.querySelector('.toggle-icon');
+                if (toggleIcon) {
+                    toggleIcon.innerHTML = dayDiv.classList.contains('expanded') ? '&#9650;' : '&#9660;';
+                }
+            }
+        }
+
+        // --- Teacher Mode Functionality ---
         function toggleTeacherFormFields() {
             const action = document.getElementById('teacherAction').value;
             document.getElementById('teacherLevelGroup').style.display = 'none';
@@ -581,16 +729,18 @@
 
         async function executeTeacherAction() {
             const action = document.getElementById('teacherAction').value;
-            const topicName = document.getElementById('teacherTopicName').value;
+            const topicNameInput = document.getElementById('teacherTopicName');
             const teacherResponseDiv = document.getElementById('teacherResponse');
             teacherResponseDiv.innerHTML = 'Executing teacher action...';
             teacherResponseDiv.classList.remove('error');
 
             updateSessionTopics(); // Ensure sessionTopics are up-to-date
 
-            let payload = {
-                topic_name: topicName,
-            };
+            let payload = {};
+            // Only add topic_name if the action requires it and the input is not empty
+            if (action !== 'explain_plan' && action !== 'explain_today' && topicNameInput.value.trim() !== '') {
+                payload.topic_name = topicNameInput.value;
+            }
 
             if (action === 'explain_topic') {
                 payload.level = document.getElementById('teacherLevel').value;
@@ -598,7 +748,10 @@
                 payload.count = parseInt(document.getElementById('teacherCount').value);
             } else if (action === 'explain_today') {
                 payload.today_iso = document.getElementById('teacherToday').value || null;
-                delete payload.topic_name;
+                // For 'explain_today', topic_name is not needed and should not be sent
+                if (payload.hasOwnProperty('topic_name')) {
+                    delete payload.topic_name;
+                }
             }
 
             let sessionState = {

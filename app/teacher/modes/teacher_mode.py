@@ -1,12 +1,7 @@
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
 from typing import Any, Dict, List, Optional
 import json
 
-from Scheduler import topic_to_dict, study_plan_to_dict
-from Scheduler import Topic, StudyPlan  # other imports removed since unused
+from app.logic.scheduler import topic_to_dict, study_plan_to_dict, Topic, StudyPlan
 
 
 base_system_prompt = """
@@ -424,7 +419,23 @@ def teacher_llm_request(
     payload: Dict[str, Any],
     session_state: Dict[str, Any],
 ) -> Dict[str, Any]:
-    topics: List[Topic] = session_state.get("topics") or []
+    raw_topics = session_state.get("topics") or []
+    topics: List[Topic] = []
+    for t in raw_topics:
+        if isinstance(t, dict):
+            # Convert dict back to Topic object
+            # Note: Ensure keys match Topic dataclass fields
+            topics.append(Topic(
+                name=t.get("topic_name", ""),
+                subject_name=t.get("subject_name", ""),
+                weight=t.get("weight", "medium"),
+                difficulty=t.get("difficulty", "medium"),
+                weakness=t.get("weakness", "moderate"),
+                progress=t.get("progress", 0.0),
+                base_hours=t.get("base_hours", 2.0)
+            ))
+        else:
+            topics.append(t)
     plan: Optional[StudyPlan] = session_state.get("plan")
 
     action = (action or "").strip().lower()

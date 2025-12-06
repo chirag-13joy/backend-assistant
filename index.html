@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Assistant</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #e9eff4;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav a:hover {
+            color: #3498db;
+        }
+
+        /* Container */
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            padding: 0 20px; /* Add padding for smaller screens */
+        }
+
+        /* Section Headers */
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        /* Topic Group for Planner */
+        .topic-group {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-group button {
+            background-color: #e74c3c;
+            margin-top: 15px;
+        }
+
+        .topic-group button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        #addTopic {
+            background-color: #27ae60;
+            margin-right: 15px;
+        }
+
+        #addTopic:hover {
+            background-color: #229954;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Response Areas */
+        #response, #teacherResponse, #practiceResponse, #studyPlanDisplay, #revisionModeDisplay, #examStrategyDisplay {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: #fce4e4;
+            border-color: #e74c3c;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 50px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tabbed Interface */
+        .tab-content {
+            display: none;
+            padding-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ced4da;
+            flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
+        }
+
+        .tab-button {
+            background-color: #f0f2f5;
+            border: 1px solid #ced4da;
+            border-bottom: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0 2px;
+            flex-shrink: 0; /* Prevent buttons from shrinking too much */
+        }
+
+        .tab-button.active {
+            background-color: white;
+            color: #2c3e50;
+            border-color: #3498db;
+            border-bottom: 1px solid white;
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: #e0e2e5;
+            color: #333;
+        }
+
+        /* Study Plan Display Styles */
+        .study-plan-day {
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .study-plan-day-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .study-plan-day-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .study-plan-day-header .toggle-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .study-plan-day.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .study-plan-day-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .study-plan-day.expanded .study-plan-day-content {
+            display: block;
+        }
+
+        .task-card {
+            background-color: #fdfdfd;
+            border: 1px solid #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .task-card-details {
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+
+        .task-card-details p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .task-card-details p strong {
+            color: #555;
+        }
+
+        .task-card-duration {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1em;
+            background-color: #eaf5ff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Teacher Mode Specific Styles */
+        #teacherLevelGroup, #teacherCountGroup, #teacherTodayGroup {
+            display: none; /* Hidden by default, shown by JS */
+        }
+
+        /* Practice Mode Styles */
+        .practice-mode-setup, .practice-session {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .practice-question-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .practice-question-card p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .practice-answer-input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #27ae60;
+            width: 0%; /* Initial width */
+            border-radius: 5px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 0.8em;
+        }
+        .feedback-message {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+
+        /* Revision Mode Styles */
+        .revision-topic-list, .exam-strategy-list {
+            list-style: none;
+            padding: 0;
+        }
+        .revision-topic-item, .exam-strategy-item {
+            background-color: #fdfdfd;
+            border: 1px solid #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .revision-topic-item.weak {
+            border-left: 5px solid #e74c3c;
+        }
+        .revision-topic-item.strong {
+            border-left: 5px solid #27ae60;
+        }
+        .exam-strategy-item p {
+            margin: 5px 0;
+        }
+        .exam-strategy-item .time-allocation {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>AI Study Assistant</h1>
+        <nav>
+            <a href="#" onclick="showTab('planner')">Study Planner</a>
+            <a href="#" onclick="showTab('teacher')">Teacher Mode</a>
+            <a href="#" onclick="showTab('practice')">Practice Mode</a>
+            <a href="#" onclick="showTab('revision')">Revision</a>
+            <a href="#" onclick="showTab('exam')">Exam Strategy</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('planner')">Study Planner</button>
+            <button class="tab-button" onclick="showTab('teacher')">Teacher Mode</button>
+            <button class="tab-button" onclick="showTab('practice')">Practice Mode</button>
+            <button class="tab-button" onclick="showTab('revision')">Revision</button>
+            <button class="tab-button" onclick="showTab('exam')">Exam Strategy</button>
+        </div>
+
+        <!-- Study Planner Tab -->
+        <div id="plannerTab" class="tab-content active">
+            <h2>Study Plan Generator</h2>
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" value="2025-11-26">
+            </div>
+            <div class="form-group">
+                <label for="examDate">Exam Date:</label>
+                <input type="date" id="examDate" value="2025-12-26">
+            </div>
+            <div class="form-group">
+                <label for="hoursPerDay">Hours Per Day:</label>
+                <input type="number" id="hoursPerDay" value="4" min="1" step="0.5">
+            </div>
+
+            <h2>Topics</h2>
+            <div id="topicsContainer">
+                <div class="topic-group" id="topic-0">
+                    <div class="form-group">
+                        <label for="subjectName-0">Subject Name:</label>
+                        <input type="text" id="subjectName-0" value="Mathematics">
+                    </div>
+                    <div class="form-group">
+                        <label for="topicName-0">Topic Name:</label>
+                        <input type="text" id="topicName-0" value="Algebra Basics">
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty-0">Difficulty:</label>
+                        <select id="difficulty-0">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-0">Weight:</label>
+                        <select id="weight-0">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weakness-0">Weakness:</label>
+                        <select id="weakness-0">
+                            <option value="strong">Strong</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="weak">Weak</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="progress-0">Progress (0.0 - 1.0):</label>
+                        <input type="number" id="progress-0" value="0.2" min="0" max="1" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="baseHours-0">Base Hours:</label>
+                        <input type="number" id="baseHours-0" value="10" min="0.5" step="0.5">
+                    </div>
+                    <button type="button" onclick="removeTopic(0)">Remove Topic</button>
+                </div>
+            </div>
+            <div class="button-group">
+                <button type="button" id="addTopic">Add Another Topic</button>
+                <button type="submit" id="generatePlan">Generate Study Plan</button>
+                <button type="button" id="checkBackend">Check Backend</button>
+            </div>
+            <h2>Response</h2>
+            <pre id="response"></pre>
+            <div id="studyPlanDisplay">
+                <h2>Your Study Plan</h2>
+                <div id="studyPlanContent">
+                    <p>Generate a study plan to see your schedule here.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Mode Tab -->
+        <div id="teacherTab" class="tab-content">
+            <h2>Teacher Mode</h2>
+            <div class="section-header">Get explanations, summaries, examples, or check understanding.</div>
+            <div class="teacher-mode-setup">
+                <div class="form-group">
+                    <label for="teacherAction">Action:</label>
+                    <select id="teacherAction">
+                        <option value="explain_topic" selected>Explain Topic</option>
+                        <option value="summarize_topic">Summarize Topic</option>
+                        <option value="give_examples">Give Examples</option>
+                        <option value="check_understanding">Check Understanding</option>
+                        <option value="breakdown_steps">Breakdown Steps</option>
+                        <option value="explain_plan">Explain Study Plan</option>
+                        <option value="explain_today">Explain Today's Plan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="teacherTopicName">Topic Name:</label>
+                    <input type="text" id="teacherTopicName" value="Algebra Basics">
+                </div>
+                <div class="form-group" id="teacherLevelGroup">
+                    <label for="teacherLevel">Explanation Level:</label>
+                    <select id="teacherLevel">
+                        <option value="basic">Basic</option>
+                        <option value="default" selected>Default</option>
+                        <option value="deep">Deep</option>
+                    </select>
+                </div>
+                <div class="form-group" id="teacherCountGroup" style="display:none;">
+                    <label for="teacherCount">Number of Examples:</label>
+                    <input type="number" id="teacherCount" value="2" min="1" step="1">
+                </div>
+                <div class="form-group" id="teacherTodayGroup" style="display:none;">
+                    <label for="teacherToday">Today's Date (ISO format, e.g., 2025-11-26):</label>
+                    <input type="text" id="teacherToday" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="button-group">
+                    <button type="button" id="executeTeacherAction">Execute Teacher Action</button>
+                </div>
+            </div>
+            <h2>Response</h2>
+            <pre id="teacherResponse"></pre>
+        </div>
+
+        <!-- Practice Mode Tab -->
+        <div id="practiceTab" class="tab-content">
+            <h2>Practice Mode</h2>
+            <div class="section-header">Test your knowledge with practice questions.</div>
+            <div class="practice-mode-setup">
+                <div class="form-group">
+                    <label for="practiceTopicName">Topic Name:</label>
+                    <input type="text" id="practiceTopicName" value="Algebra Basics">
+                </div>
+                <div class="form-group">
+                    <label for="practiceDifficulty">Difficulty:</label>
+                    <select id="practiceDifficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="practiceNumQuestions">Number of Questions:</label>
+                    <input type="number" id="practiceNumQuestions" value="5" min="1" step="1">
+                </div>
+                <div class="button-group">
+                    <button type="button" id="startPracticeSession">Start Practice Session</button>
+                </div>
+            </div>
+            <div class="practice-session" style="display: none;">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="practiceProgress">0%</div>
+                </div>
+                <p>Question <span id="currentQuestionNumber">1</span> of <span id="totalQuestions"></span></p>
+                <div class="practice-question-card">
+                    <p id="practiceQuestionText"></p>
+                    <input type="text" class="practice-answer-input" id="practiceAnswerInput" placeholder="Enter your answer">
+                    <div class="button-group">
+                        <button type="button" id="submitPracticeAnswer">Submit Answer</button>
+                    </div>
+                    <div class="feedback-message" id="practiceFeedback"></div>
+                </div>
+                <div class="button-group">
+                    <button type="button" id="nextPracticeQuestion" style="display: none;">Next Question</button>
+                    <button type="button" id="endPracticeSession" style="display: none;">End Session</button>
+                </div>
+            </div>
+            <h2>Session Summary</h2>
+            <pre id="practiceResponse"></pre>
+        </div>
+
+        <!-- Revision Mode Tab -->
+        <div id="revisionTab" class="tab-content">
+            <h2>Revision Mode</h2>
+            <div class="section-header">Focus on weak areas and high-yield topics.</div>
+            <div class="revision-mode-setup">
+                <div class="form-group">
+                    <label for="revisionTopicName">Topic Name (Optional):</label>
+                    <input type="text" id="revisionTopicName" placeholder="e.g., Calculus">
+                </div>
+                <div class="button-group">
+                    <button type="button" id="generateRevisionPlan">Generate Revision Plan</button>
+                </div>
+            </div>
+            <div id="revisionModeDisplay">
+                <h2>Revision Plan</h2>
+                <div id="revisionContent">
+                    <p>Generate a revision plan to see your schedule here.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam Strategy Tab -->
+        <div id="examTab" class="tab-content">
+            <h2>Exam Strategy</h2>
+            <div class="section-header">Get recommendations for exam preparation.</div>
+            <div class="exam-strategy-setup">
+                <div class="form-group">
+                    <label for="examDateStrategy">Exam Date:</label>
+                    <input type="date" id="examDateStrategy" value="2025-12-26">
+                </div>
+                 <div class="form-group">
+                    <label for="examTopics">Topics to Cover:</label>
+                    <textarea id="examTopics" rows="4" placeholder="Enter topics separated by commas, e.g., Algebra, Calculus, Statistics">
+Mathematics
+Algebra Basics
+Physics
+Mechanics</textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" id="generateExamStrategy">Generate Exam Strategy</button>
+                </div>
+            </div>
+            <div id="examStrategyDisplay">
+                <h2>Exam Strategy</h2>
+                <div id="examStrategyContent">
+                    <p>Generate an exam strategy to see recommendations here.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        AI Study Assistant &copy; 2025
+    </footer>
+
+    <script>
+        // --- State Variables ---
+        let topicCount = 1;
+        let sessionTopics = []; // For planner and teacher mode context
+        let currentStudyPlan = null; // Stores the generated study plan from the planner
+        let currentPracticeSession = null; // Stores state for the current practice session
+        let currentRevisionPlan = null;
+        let currentExamStrategy = null;
+
+        // --- DOM Element Cache ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Planner Elements
+        const addTopicBtn = document.getElementById('addTopic');
+        const generatePlanBtn = document.getElementById('generatePlan');
+        const checkBackendBtn = document.getElementById('checkBackend');
+        const responseDiv = document.getElementById('response');
+        const studyPlanDisplayDiv = document.getElementById('studyPlanDisplay');
+        const studyPlanContentDiv = document.getElementById('studyPlanContent');
+
+        // Teacher Mode Elements
+        const executeTeacherActionBtn = document.getElementById('executeTeacherAction');
+        const teacherActionSelect = document.getElementById('teacherAction');
+        const teacherTopicNameInput = document.getElementById('teacherTopicName');
+        const teacherLevelGroupDiv = document.getElementById('teacherLevelGroup');
+        const teacherCountGroupDiv = document.getElementById('teacherCountGroup');
+        const teacherTodayGroupDiv = document.getElementById('teacherTodayGroup');
+        const teacherResponseDiv = document.getElementById('teacherResponse');
+
+        // Practice Mode Elements
+        const startPracticeSessionBtn = document.getElementById('startPracticeSession');
+        const practiceModeSetupDiv = document.querySelector('.practice-mode-setup');
+        const practiceSessionDiv = document.querySelector('.practice-session');
+        const practiceQuestionTextP = document.getElementById('practiceQuestionText');
+        const practiceAnswerInput = document.getElementById('practiceAnswerInput');
+        const submitPracticeAnswerBtn = document.getElementById('submitPracticeAnswer');
+        const practiceFeedbackDiv = document.getElementById('practiceFeedback');
+        const currentQuestionNumberSpan = document.getElementById('currentQuestionNumber');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const practiceProgressDiv = document.getElementById('practiceProgress');
+        const nextPracticeQuestionBtn = document.getElementById('nextPracticeQuestion');
+        const endPracticeSessionBtn = document.getElementById('endPracticeSession');
+        const practiceResponseDiv = document.getElementById('practiceResponse');
+
+        // Revision Mode Elements
+        const generateRevisionPlanBtn = document.getElementById('generateRevisionPlan');
+        const revisionContentDiv = document.getElementById('revisionContent');
+
+        // Exam Strategy Elements
+        const generateExamStrategyBtn = document.getElementById('generateExamStrategy');
+        const examStrategyContentDiv = document.getElementById('examStrategyContent');
+
+        // --- Event Listeners ---
+        addTopicBtn.addEventListener('click', addTopic);
+        generatePlanBtn.addEventListener('click', generatePlan);
+        checkBackendBtn.addEventListener('click', checkBackend);
+        executeTeacherActionBtn.addEventListener('click', executeTeacherAction);
+        teacherActionSelect.addEventListener('change', toggleTeacherFormFields);
+        startPracticeSessionBtn.addEventListener('click', startPracticeSession);
+        submitPracticeAnswerBtn.addEventListener('click', submitPracticeAnswer);
+        nextPracticeQuestionBtn.addEventListener('click', loadNextPracticeQuestion);
+        endPracticeSessionBtn.addEventListener('click', endPracticeSession);
+        generateRevisionPlanBtn.addEventListener('click', generateRevisionPlan);
+        generateExamStrategyBtn.addEventListener('click', generateExamStrategy);
+
+        // --- Tab Functionality ---
+        function showTab(tabId) {
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabId + 'Tab').classList.add('active');
+            const activeButton = Array.from(tabButtons).find(btn => btn.getAttribute('onclick').includes(`'${tabId}'`));
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+
+        // Add event listeners to navigation links in the navbar
+        document.querySelectorAll('.navbar nav a').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const tabId = link.getAttribute('onclick').match(/'(.*?)'/)[1];
+                showTab(tabId);
+            });
+        });
+
+        // --- Topic Management (Planner) ---
+        function addTopic() {
+            const container = document.getElementById('topicsContainer');
+            const newTopicGroup = document.createElement('div');
+            newTopicGroup.classList.add('topic-group');
+            newTopicGroup.id = `topic-${topicCount}`;
+            newTopicGroup.innerHTML = `
+                <div class="form-group">
+                    <label for="subjectName-${topicCount}">Subject Name:</label>
+                    <input type="text" id="subjectName-${topicCount}" value="Physics">
+                </div>
+                <div class="form-group">
+                    <label for="topicName-${topicCount}">Topic Name:</label>
+                    <input type="text" id="topicName-${topicCount}" value="Mechanics">
+                </div>
+                <div class="form-group">
+                    <label for="difficulty-${topicCount}">Difficulty:</label>
+                    <select id="difficulty-${topicCount}">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="weight-${topicCount}">Weight:</label>
+                    <select id="weight-${topicCount}">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="weakness-${topicCount}">Weakness:</label>
+                    <select id="weakness-${topicCount}">
+                        <option value="strong">Strong</option>
+                        <option value="moderate" selected>Moderate</option>
+                        <option value="weak">Weak</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="progress-${topicCount}">Progress (0.0 - 1.0):</label>
+                    <input type="number" id="progress-${topicCount}" value="0.5" min="0" max="1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="baseHours-${topicCount}">Base Hours:</label>
+                    <input type="number" id="baseHours-${topicCount}" value="15" min="0.5" step="0.5">
+                </div>
+                <button type="button" onclick="removeTopic(${topicCount})">Remove Topic</button>
+            `;
+            container.appendChild(newTopicGroup);
+            topicCount++;
+        }
+
+        function removeTopic(id) {
+            const topicToRemove = document.getElementById(`topic-${id}`);
+            if (topicToRemove) {
+                topicToRemove.remove();
+                updateSessionTopics(); // Rebuild sessionTopics after removing a topic
+            }
+        }
+
+        function updateSessionTopics() {
+            sessionTopics = [];
+            for (let i = 0; i < topicCount; i++) {
+                const topicGroup = document.getElementById(`topic-${i}`);
+                if (topicGroup) {
+                    sessionTopics.push({
+                        topic_name: document.getElementById(`topicName-${i}`).value,
+                        subject_name: document.getElementById(`subjectName-${i}`).value,
+                        difficulty: document.getElementById(`difficulty-${i}`).value,
+                        weight: document.getElementById(`weight-${i}`).value,
+                        weakness: document.getElementById(`weakness-${i}`).value,
+                        progress: parseFloat(document.getElementById(`progress-${i}`).value),
+                        base_hours: parseFloat(document.getElementById(`baseHours-${i}`).value),
+                    });
+                }
+            }
+        }
+
+        // --- Backend Communication ---
+        async function checkBackend() {
+            responseDiv.innerHTML = 'Checking backend health...';
+            responseDiv.classList.remove('error');
+            try {
+                const response = await fetch('http://localhost:8000/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error checking backend:', error);
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.classList.add('error');
+            }
+        }
+
+        async function generatePlan() {
+            const startDate = document.getElementById('startDate').value;
+            const examDate = document.getElementById('examDate').value;
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+            responseDiv.innerHTML = 'Generating plan...';
+            responseDiv.classList.remove('error');
+
+            updateSessionTopics();
+
+            const payload = {
+                start_date: startDate,
+                exam_date: examDate,
+                hours_per_day: hoursPerDay,
+                topics: sessionTopics,
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/study_plan/generate_study_plan', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentStudyPlan = data;
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                renderStudyPlan(data);
+                studyPlanDisplayDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error generating study plan:', error);
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.classList.add('error');
+            }
+        }
+
+        function renderStudyPlan(plan) {
+            studyPlanContentDiv.innerHTML = '';
+            // Backend returns 'days', not 'plan_by_day'
+            if (!plan || !plan.days || plan.days.length === 0) {
+                studyPlanContentDiv.innerHTML = '<p>No study plan available. Please generate a plan first.</p>';
+                return;
+            }
+
+            plan.days.forEach((dayData, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('study-plan-day', 'collapsed');
+                dayDiv.innerHTML = `
+                    <div class="study-plan-day-header" onclick="toggleDay(${index})">
+                        <span>${dayData.date} - Total Hours: ${dayData.total_hours.toFixed(2)}</span>
+                        <span class="toggle-icon">&#9660;</span>
+                    </div>
+                    <div class="study-plan-day-content">
+                    </div>
+                `;
+
+                const dayContentDiv = dayDiv.querySelector('.study-plan-day-content');
+                if (dayData.tasks && dayData.tasks.length > 0) {
+                    dayData.tasks.forEach(task => {
+                        const taskCard = document.createElement('div');
+                        taskCard.classList.add('task-card');
+                        // Backend returns: subject_name, topic_name, task_type, duration_hours
+                        taskCard.innerHTML = `
+                            <div class="task-card-details">
+                                <p><strong>Subject:</strong> ${task.subject_name}</p>
+                                <p><strong>Topic:</strong> ${task.topic_name}</p>
+                                <p><strong>Type:</strong> ${task.task_type}</p>
+                            </div>
+                            <div class="task-card-duration">${task.duration_hours.toFixed(2)} hrs</div>
+                        `;
+                        dayContentDiv.appendChild(taskCard);
+                    });
+                } else {
+                    dayContentDiv.innerHTML = '<p>No tasks scheduled for this day.</p>';
+                }
+                studyPlanContentDiv.appendChild(dayDiv);
+            });
+        }
+
+        function toggleDay(index) {
+            const allDayDivs = document.querySelectorAll('.study-plan-day');
+            if (index >= 0 && index < allDayDivs.length) {
+                const dayDiv = allDayDivs[index];
+                dayDiv.classList.toggle('collapsed');
+                dayDiv.classList.toggle('expanded');
+                const toggleIcon = dayDiv.querySelector('.toggle-icon');
+                if (toggleIcon) {
+                    toggleIcon.innerHTML = dayDiv.classList.contains('expanded') ? '&#9650;' : '&#9660;';
+                }
+            }
+        }
+
+        // --- Teacher Mode ---
+        function toggleTeacherFormFields() {
+            const action = teacherActionSelect.value;
+            teacherLevelGroupDiv.style.display = 'none';
+            teacherCountGroupDiv.style.display = 'none';
+            teacherTodayGroupDiv.style.display = 'none';
+
+            if (action === 'explain_topic') {
+                teacherLevelGroupDiv.style.display = 'block';
+            } else if (action === 'give_examples') {
+                teacherCountGroupDiv.style.display = 'block';
+            } else if (action === 'explain_today') {
+                teacherTodayGroupDiv.style.display = 'block';
+            }
+        }
+
+        async function executeTeacherAction() {
+            const action = teacherActionSelect.value;
+            const topicName = teacherTopicNameInput.value;
+            teacherResponseDiv.innerHTML = 'Executing teacher action...';
+            teacherResponseDiv.classList.remove('error');
+
+            updateSessionTopics();
+
+            let payload = {};
+            if (action !== 'explain_plan' && action !== 'explain_today' && topicName.trim() !== '') {
+                payload.topic_name = topicName;
+            }
+
+            if (action === 'explain_topic') {
+                payload.level = document.getElementById('teacherLevel').value;
+            } else if (action === 'give_examples') {
+                payload.count = parseInt(document.getElementById('teacherCount').value);
+            } else if (action === 'explain_today') {
+                payload.today_iso = document.getElementById('teacherToday').value || null;
+                if (payload.hasOwnProperty('topic_name')) delete payload.topic_name;
+            }
+
+            let sessionState = { topics: sessionTopics };
+            if (currentStudyPlan) sessionState.plan = currentStudyPlan;
+
+            const requestBody = { action, payload, session_state: sessionState };
+
+            try {
+                const response = await fetch('http://localhost:8000/teacher/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                teacherResponseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error executing teacher action:', error);
+                teacherResponseDiv.textContent = `Error: ${error.message}`;
+                teacherResponseDiv.classList.add('error');
+            }
+        }
+
+        // --- Practice Mode ---
+        async function startPracticeSession() {
+            const topicName = document.getElementById('practiceTopicName').value;
+            const difficulty = document.getElementById('practiceDifficulty').value;
+            const numQuestions = parseInt(document.getElementById('practiceNumQuestions').value);
+
+            practiceResponseDiv.innerHTML = 'Starting practice session...';
+            practiceResponseDiv.classList.remove('error');
+            
+            updateSessionTopics(); // Ensure topics are available for context if needed
+
+            const payload = {
+                topic_name: topicName,
+                difficulty: difficulty,
+                num_questions: numQuestions
+            };
+
+            let sessionState = { topics: sessionTopics };
+            if (currentStudyPlan) sessionState.plan = currentStudyPlan;
+
+            const requestBody = { action: 'start_practice', payload, session_state: sessionState };
+
+            try {
+                const response = await fetch('http://localhost:8000/practice/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentPracticeSession = data;
+                totalQuestionsSpan.textContent = numQuestions;
+                currentQuestionNumberSpan.textContent = 1;
+                practiceProgressDiv.style.width = '0%';
+                practiceProgressDiv.textContent = '0%';
+                practiceResponseDiv.textContent = '';
+                
+                practiceModeSetupDiv.style.display = 'none';
+                practiceSessionDiv.style.display = 'block';
+                submitPracticeAnswerBtn.style.display = 'inline-block';
+                nextPracticeQuestionBtn.style.display = 'none';
+                endPracticeSessionBtn.style.display = 'inline-block';
+
+                loadPracticeQuestion(data.session_id, 0); // Load first question
+            } catch (error) {
+                console.error('Error starting practice session:', error);
+                practiceResponseDiv.textContent = `Error: ${error.message}`;
+                practiceResponseDiv.classList.add('error');
+            }
+        }
+
+        async function loadPracticeQuestion(sessionId, questionIndex) {
+            practiceAnswerInput.value = '';
+            practiceFeedbackDiv.textContent = '';
+            submitPracticeAnswerBtn.style.display = 'inline-block';
+            nextPracticeQuestionBtn.style.display = 'none';
+
+            try {
+                const response = await fetch(`http://localhost:8000/practice/${sessionId}/question/${questionIndex}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+                const data = await response.json();
+                currentPracticeSession.questions[questionIndex] = data; // Store question details
+                practiceQuestionTextP.textContent = data.question;
+                currentQuestionNumberSpan.textContent = questionIndex + 1;
+
+                // Update progress bar
+                const progress = ((questionIndex + 1) / currentPracticeSession.num_questions) * 100;
+                practiceProgressDiv.style.width = `${progress}%`;
+                practiceProgressDiv.textContent = `${Math.round(progress)}%`;
+
+            } catch (error) {
+                console.error('Error loading practice question:', error);
+                practiceFeedbackDiv.textContent = `Error loading question: ${error.message}`;
+                practiceFeedbackDiv.className = 'feedback-message incorrect';
+                submitPracticeAnswerBtn.style.display = 'none';
+            }
+        }
+
+        async function submitPracticeAnswer() {
+            const userAnswer = practiceAnswerInput.value;
+            const currentQuestionIndex = parseInt(currentQuestionNumberSpan.textContent) - 1;
+            const questionData = currentPracticeSession.questions[currentQuestionIndex];
+
+            submitPracticeAnswerBtn.style.display = 'none'; // Hide submit button
+
+            try {
+                const response = await fetch('http://localhost:8000/practice/submit_answer', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentPracticeSession.session_id,
+                        question_index: currentQuestionIndex,
+                        user_answer: userAnswer
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentPracticeSession.results[currentQuestionIndex] = data; // Store result
+
+                if (data.is_correct) {
+                    practiceFeedbackDiv.textContent = 'Correct!';
+                    practiceFeedbackDiv.className = 'feedback-message correct';
+                } else {
+                    practiceFeedbackDiv.textContent = `Incorrect. The correct answer is: ${questionData.correct_answer}`;
+                    practiceFeedbackDiv.className = 'feedback-message incorrect';
+                }
+
+                if (currentQuestionIndex < currentPracticeSession.num_questions - 1) {
+                    nextPracticeQuestionBtn.style.display = 'inline-block';
+                } else {
+                    endPracticeSessionBtn.textContent = 'Finish Session';
+                }
+
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                practiceFeedbackDiv.textContent = `Error submitting answer: ${error.message}`;
+                practiceFeedbackDiv.className = 'feedback-message incorrect';
+                nextPracticeQuestionBtn.style.display = 'inline-block'; // Allow moving on even on error
+            }
+        }
+
+        function loadNextPracticeQuestion() {
+            const currentQuestionIndex = parseInt(currentQuestionNumberSpan.textContent) - 1;
+            loadPracticeQuestion(currentPracticeSession.session_id, currentQuestionIndex + 1);
+        }
+
+        async function endPracticeSession() {
+            practiceSessionDiv.style.display = 'none';
+            submitPracticeAnswerBtn.style.display = 'none';
+            nextPracticeQuestionBtn.style.display = 'none';
+            endPracticeSessionBtn.style.display = 'none';
+            practiceAnswerInput.value = '';
+            practiceFeedbackDiv.textContent = '';
+
+            // Fetch final summary and display
+            try {
+                const response = await fetch(`http://localhost:8000/practice/${currentPracticeSession.session_id}/summary`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+                const data = await response.json();
+                practiceResponseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error fetching practice session summary:', error);
+                practiceResponseDiv.textContent = `Error fetching summary: ${error.message}`;
+                practiceResponseDiv.classList.add('error');
+            }
+        }
+
+        // --- Revision Mode ---
+        async function generateRevisionPlan() {
+            const topicName = document.getElementById('revisionTopicName').value;
+            revisionContentDiv.innerHTML = 'Generating revision plan...';
+            revisionContentDiv.classList.remove('error');
+
+            updateSessionTopics();
+
+            const payload = {
+                topic_name: topicName || undefined, // Send only if provided
+            };
+            let sessionState = { topics: sessionTopics };
+            if (currentStudyPlan) sessionState.plan = currentStudyPlan;
+
+            const requestBody = { action: 'generate_revision_plan', payload, session_state: sessionState };
+
+            try {
+                const response = await fetch('http://localhost:8000/revision/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentRevisionPlan = data;
+                renderRevisionPlan(data);
+            } catch (error) {
+                console.error('Error generating revision plan:', error);
+                revisionContentDiv.innerHTML = `Error: ${error.message}`;
+                revisionContentDiv.classList.add('error');
+            }
+        }
+
+        function renderRevisionPlan(plan) {
+            revisionContentDiv.innerHTML = '';
+            if (!plan || !plan.revision_topics || plan.revision_topics.length === 0) {
+                revisionContentDiv.innerHTML = '<p>No revision topics found. Please ensure topics are entered in the planner.</p>';
+                return;
+            }
+
+            const topicList = document.createElement('ul');
+            topicList.classList.add('revision-topic-list');
+
+            plan.revision_topics.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('revision-topic-item');
+                if (item.weakness === 'weak') {
+                    listItem.classList.add('weak');
+                } else if (item.weakness === 'strong') {
+                    listItem.classList.add('strong');
+                }
+                listItem.innerHTML = `
+                    <div class="task-card-details">
+                        <p><strong>Subject:</strong> ${item.subject}</p>
+                        <p><strong>Topic:</strong> ${item.topic}</p>
+                    </div>
+                    <div class="task-card-duration">${item.priority}</div>
+                `;
+                topicList.appendChild(listItem);
+            });
+            revisionContentDiv.appendChild(topicList);
+        }
+
+        // --- Exam Strategy ---
+        async function generateExamStrategy() {
+            const examDate = document.getElementById('examDateStrategy').value;
+            const examTopicsInput = document.getElementById('examTopics').value;
+            examStrategyContentDiv.innerHTML = 'Generating exam strategy...';
+            examStrategyContentDiv.classList.remove('error');
+
+            const topics = examTopicsInput.split('\n').map(topic => topic.trim()).filter(topic => topic !== '');
+
+            let sessionState = { topics: sessionTopics };
+            if (currentStudyPlan) sessionState.plan = currentStudyPlan;
+
+            const payload = {
+                exam_date: examDate,
+                topics: topics
+            };
+            const requestBody = { action: 'generate_exam_strategy', payload, session_state: sessionState };
+
+            try {
+                const response = await fetch('http://localhost:8000/exam/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || errorData.reason || JSON.stringify(errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentExamStrategy = data;
+                renderExamStrategy(data);
+            } catch (error) {
+                console.error('Error generating exam strategy:', error);
+                examStrategyContentDiv.innerHTML = `Error: ${error.message}`;
+                examStrategyContentDiv.classList.add('error');
+            }
+        }
+
+        function renderExamStrategy(strategy) {
+            examStrategyContentDiv.innerHTML = '';
+            if (!strategy) {
+                examStrategyContentDiv.innerHTML = '<p>No exam strategy generated.</p>';
+                return;
+            }
+
+            const strategyDiv = document.createElement('div');
+            strategyDiv.innerHTML = `
+                <p><strong>Recommended Order:</strong> ${strategy.recommended_order.join(', ')}</p>
+                <p><strong>Time Allocations:</strong> ${strategy.time_allocations.map(item => `${item.topic}: ${item.hours} hrs`).join(', ')}</p>
+                <p><strong>High Yield Topics:</strong> ${strategy.high_yield_topics.join(', ')}</p>
+                <h3>Quick Revision Notes:</h3>
+                <ul>
+                    ${strategy.quick_revision_notes.map(note => `<li>${note}</li>`).join('')}
+                </ul>
+            `;
+            examStrategyContentDiv.appendChild(strategyDiv);
+        }
+
+        // --- Initialization ---
+        toggleTeacherFormFields(); // Initialize Teacher Mode visibility
+        showTab('planner'); // Set default tab to Planner
+    </script>
+</body>
+</html>
