@@ -1,9 +1,29 @@
-# Virtual environment
-venv/
 
-# Environment variables
-.env
-
-# Python cache
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Distributions and packaging
+.Python
+build/
+dist/
+venv/
+env/
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+.env
+.flaskenv
+
+# My stuff
+*.log
+*.sqlite3
+instance/

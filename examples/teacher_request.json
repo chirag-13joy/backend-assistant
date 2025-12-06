@@ -1,0 +1,20 @@
+{
+    "action": "explain_topic",
+    "payload": {
+        "topic_name": "Algebra Basics",
+        "level": "default"
+    },
+    "session_state": {
+        "topics": [
+            {
+                "name": "Algebra Basics",
+                "subject_name": "Mathematics",
+                "weight": "high",
+                "difficulty": "easy",
+                "weakness": "weak",
+                "progress": 0.2,
+                "base_hours": 10.0
+            }
+        ]
+    }
+}

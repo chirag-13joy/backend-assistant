@@ -1,0 +1,12 @@
+{
+    "kind": "multiple_choice_question",
+    "topic_name": "Algebra Basics",
+    "question_text": "Solve for x in the equation: 2x + 3 = 11",
+    "options": [
+        "x = 3",
+        "x = 4",
+        "x = 5",
+        "x = 6"
+    ],
+    "correct_option": "x = 4"
+}

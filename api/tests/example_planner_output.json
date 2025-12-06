@@ -1,0 +1,39 @@
+{
+  "study_plan": [
+    {
+      "date": "2025-12-08",
+      "sessions": [
+        {
+          "topic": "Introduction to Python",
+          "start_time": "09:00",
+          "end_time": "10:00"
+        },
+        {
+          "topic": "Data Types and Variables",
+          "start_time": "10:00",
+          "end_time": "11:00"
+        },
+        {
+          "topic": "Control Flow (if/else, loops)",
+          "start_time": "11:00",
+          "end_time": "12:00"
+        }
+      ]
+    },
+    {
+      "date": "2025-12-09",
+      "sessions": [
+        {
+          "topic": "Functions and Modules",
+          "start_time": "09:00",
+          "end_time": "10:30"
+        },
+        {
+          "topic": "Data Structures (Lists, Dictionaries, Tuples, Sets)",
+          "start_time": "10:30",
+          "end_time": "12:00"
+        }
+      ]
+    }
+  ]
+}

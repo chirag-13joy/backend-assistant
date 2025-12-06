@@ -615,6 +615,8 @@ def _serialize_value(value: Any):
     # primitives
     return value
 
+def topic_to_dict(topic: Topic) -> Dict[str,Any]:
+    return _serialize_value(topic)
 
 def study_plan_to_dict(plan: StudyPlan) -> Dict[str, Any]:
     """

@@ -1,0 +1,9 @@
+{
+  "topics": [
+    "Introduction to Python",
+    "Data Types and Variables",
+    "Control Flow (if/else, loops)",
+    "Functions and Modules",
+    "Data Structures (Lists, Dictionaries, Tuples, Sets)"
+  ]
+}

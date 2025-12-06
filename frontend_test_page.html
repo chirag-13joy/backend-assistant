@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #e9eff4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav a:hover {
+            color: #3498db;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .topic-group {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .topic-group button {
+            background-color: #e74c3c;
+            margin-top: 15px;
+        }
+
+        .topic-group button:hover {
+            background-color: #c0392b;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        #addTopic {
+            background-color: #27ae60;
+            margin-right: 15px;
+        }
+
+        #addTopic:hover {
+            background-color: #229954;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #response,
+        #teacherResponse,
+        #practiceResponse {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: #fce4e4;
+            border-color: #e74c3c;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 50px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ced4da;
+        }
+
+        .tab-button {
+            background-color: #f0f2f5;
+            border: 1px solid #ced4da;
+            border-bottom: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0 2px;
+        }
+
+        .tab-button.active {
+            background-color: white;
+            color: #2c3e50;
+            border-color: #3498db;
+            border-bottom: 1px solid white;
+            /* Hide bottom border for active tab */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: #e0e2e5;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <h1>AI Study Assistant</h1>
+        <nav>
+            <a href="#" onclick="showTab('planner')">Study Planner</a>
+            <a href="#" onclick="showTab('teacher')">Teacher Mode</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('planner')">Study Planner</button>
+            <button class="tab-button" onclick="showTab('teacher')">Teacher Mode</button>
+        </div>
+
+        <div id="plannerTab" class="tab-content active">
+            <h2>Study Plan Generator</h2>
+
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" value="2025-11-26">
+            </div>
+            <div class="form-group">
+                <label for="examDate">Exam Date:</label>
+                <input type="date" id="examDate" value="2025-12-26">
+            </div>
+            <div class="form-group">
+                <label for="hoursPerDay">Hours Per Day:</label>
+                <input type="number" id="hoursPerDay" value="4" min="1" step="0.5">
+            </div>
+
+            <h2>Topics</h2>
+            <div id="topicsContainer">
+                <!-- Initial topic group -->
+                <div class="topic-group" id="topic-0">
+                    <div class="form-group">
+                        <label for="subjectName-0">Subject Name:</label>
+                        <input type="text" id="subjectName-0" value="Mathematics">
+                    </div>
+                    <div class="form-group">
+                        <label for="topicName-0">Topic Name:</label>
+                        <input type="text" id="topicName-0" value="Algebra Basics">
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty-0">Difficulty:</label>
+                        <select id="difficulty-0">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-0">Weight:</label>
+                        <select id="weight-0">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weakness-0">Weakness:</label>
+                        <select id="weakness-0">
+                            <option value="strong">Strong</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="weak">Weak</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="progress-0">Progress (0.0 - 1.0):</label>
+                        <input type="number" id="progress-0" value="0.2" min="0" max="1" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="baseHours-0">Base Hours:</label>
+                        <input type="number" id="baseHours-0" value="10" min="0.5" step="0.5">
+                    </div>
+                    <button type="button" onclick="removeTopic(0)">Remove Topic</button>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="addTopic">Add Another Topic</button>
+                <button type="submit" id="generatePlan">Generate Study Plan</button>
+                <button type="button" id="checkBackend">Check Backend</button>
+            </div>
+
+            <h2>Response</h2>
+            <pre id="response"></pre>
+        </div>
+
+        <div id="teacherTab" class="tab-content">
+            <h2>Teacher Mode</h2>
+            <div class="section-header">Get explanations, summaries, examples, or check understanding.</div>
+
+            <div class="form-group">
+                <label for="teacherAction">Action:</label>
+                <select id="teacherAction">
+                    <option value="explain_topic" selected>Explain Topic</option>
+                    <option value="summarize_topic">Summarize Topic</option>
+                    <option value="give_examples">Give Examples</option>
+                    <option value="check_understanding">Check Understanding</option>
+                    <option value="breakdown_steps">Breakdown Steps</option>
+                    <option value="explain_plan">Explain Study Plan</option>
+                    <option value="explain_today">Explain Today's Plan</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="teacherTopicName">Topic Name:</label>
+                <input type="text" id="teacherTopicName" value="Algebra Basics">
+            </div>
+            <div class="form-group" id="teacherLevelGroup">
+                <label for="teacherLevel">Explanation Level:</label>
+                <select id="teacherLevel">
+                    <option value="basic">Basic</option>
+                    <option value="default" selected>Default</option>
+                    <option value="deep">Deep</option>
+                </select>
+            </div>
+            <div class="form-group" id="teacherCountGroup" style="display:none;">
+                <label for="teacherCount">Number of Examples:</label>
+                <input type="number" id="teacherCount" value="2" min="1" step="1">
+            </div>
+            <div class="form-group" id="teacherTodayGroup" style="display:none;">
+                <label for="teacherToday">Today's Date (ISO format, e.g., 2025-11-26):</label>
+                <input type="text" id="teacherToday" placeholder="YYYY-MM-DD">
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="executeTeacherAction">Execute Teacher Action</button>
+            </div>
+
+            <h2>Response</h2>
+            <pre id="teacherResponse"></pre>
+        </div>
+
+    </div>
+
+    <footer>
+        AI Study Assistant &copy; 2025
+    </footer>
+
+    <script>
+        let topicCount = 1;
+        let sessionTopics = []; // To store topics for Teacher/Practice modes
+        let currentStudyPlan = null; // To store the generated study plan
+
+        document.getElementById('addTopic').addEventListener('click', addTopic);
+        document.getElementById('generatePlan').addEventListener('click', generatePlan);
+        document.getElementById('checkBackend').addEventListener('click', checkBackend);
+        document.getElementById('executeTeacherAction').addEventListener('click', executeTeacherAction);
+        document.getElementById('teacherAction').addEventListener('change', toggleTeacherFormFields);
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId + 'Tab').classList.add('active');
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Find the button that corresponds to the tab and set it to active
+            const activeButton = Array.from(document.querySelectorAll('.tab-button')).find(btn => btn.getAttribute('onclick').includes(`'${tabId}'`));
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+
+        // Overwrite the previous showTab to handle the nav links as well
+        const navLinks = document.querySelectorAll('.navbar nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const tabId = link.getAttribute('onclick').match(/'(.*?)'/)[1];
+
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(tabId + 'Tab').classList.add('active');
+
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                const activeButton = Array.from(document.querySelectorAll('.tab-button')).find(btn => btn.getAttribute('onclick').includes(`'${tabId}'`));
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+            });
+        });
+
+
+        function addTopic() {
+            const container = document.getElementById('topicsContainer');
+            const newTopicGroup = document.createElement('div');
+            newTopicGroup.classList.add('topic-group');
+            newTopicGroup.id = `topic-${topicCount}`;
+            newTopicGroup.innerHTML = `
+                <div class="form-group">
+                    <label for="subjectName-${topicCount}">Subject Name:</label>
+                    <input type="text" id="subjectName-${topicCount}" value="Physics">
+                </div>
+                <div class="form-group">
+                    <label for="topicName-${topicCount}">Topic Name:</label>
+                    <input type="text" id="topicName-${topicCount}" value="Mechanics">
+                </div>
+                <div class="form-group">
+                    <label for="difficulty-${topicCount}">Difficulty:</label>
+                    <select id="difficulty-${topicCount}">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="weight-${topicCount}">Weight:</label>
+                    <select id="weight-${topicCount}">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="weakness-${topicCount}">Weakness:</label>
+                    <select id="weakness-${topicCount}">
+                        <option value="strong">Strong</option>
+                        <option value="moderate" selected>Moderate</option>
+                        <option value="weak">Weak</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="progress-${topicCount}">Progress (0.0 - 1.0):</label>
+                    <input type="number" id="progress-${topicCount}" value="0.5" min="0" max="1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="baseHours-${topicCount}">Base Hours:</label>
+                    <input type="number" id="baseHours-${topicCount}" value="15" min="0.5" step="0.5">
+                </div>
+                <button type="button" onclick="removeTopic(${topicCount})">Remove Topic</button>
+            `;
+            container.appendChild(newTopicGroup);
+            topicCount++;
+        }
+
+        function removeTopic(id) {
+            const topicToRemove = document.getElementById(`topic-${id}`);
+            if (topicToRemove) {
+                topicToRemove.remove();
+                // Rebuild sessionTopics after removing a topic
+                updateSessionTopics();
+            }
+        }
+
+        function updateSessionTopics() {
+            sessionTopics = [];
+            for (let i = 0; i < topicCount; i++) {
+                const topicGroup = document.getElementById(`topic-${i}`);
+                if (topicGroup) {
+                    sessionTopics.push({
+                        topic_name: document.getElementById(`topicName-${i}`).value,
+                        subject_name: document.getElementById(`subjectName-${i}`).value,
+                        difficulty: document.getElementById(`difficulty-${i}`).value,
+                        weight: document.getElementById(`weight-${i}`).value,
+                        weakness: document.getElementById(`weakness-${i}`).value,
+                        progress: parseFloat(document.getElementById(`progress-${i}`).value),
+                        base_hours: parseFloat(document.getElementById(`baseHours-${i}`).value),
+                    });
+                }
+            }
+        }
+
+        async function checkBackend() {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = 'Checking backend health...';
+            responseDiv.classList.remove('error');
+
+            try {
+                const response = await fetch('http://localhost:8000/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error checking backend:', error);
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.classList.add('error');
+            }
+        }
+
+        async function generatePlan() {
+            const startDate = document.getElementById('startDate').value;
+            const examDate = document.getElementById('examDate').value;
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = 'Generating plan...';
+            responseDiv.classList.remove('error');
+
+            updateSessionTopics(); // Ensure sessionTopics are up-to-date
+
+            const payload = {
+                start_date: startDate,
+                exam_date: examDate,
+                hours_per_day: hoursPerDay,
+                topics: sessionTopics, // Use sessionTopics for the payload
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/study_plan/generate_study_plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = typeof errorData.detail === 'string'
+                        ? errorData.detail
+                        : JSON.stringify(errorData.detail || errorData);
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                currentStudyPlan = data; // Store the generated plan
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error generating study plan:', error);
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.classList.add('error');
+            }
+        }
+
+        function toggleTeacherFormFields() {
+            const action = document.getElementById('teacherAction').value;
+            document.getElementById('teacherLevelGroup').style.display = 'none';
+            document.getElementById('teacherCountGroup').style.display = 'none';
+            document.getElementById('teacherTodayGroup').style.display = 'none';
+
+            if (action === 'explain_topic') {
+                document.getElementById('teacherLevelGroup').style.display = 'block';
+            } else if (action === 'give_examples') {
+                document.getElementById('teacherCountGroup').style.display = 'block';
+            } else if (action === 'explain_today') {
+                document.getElementById('teacherTodayGroup').style.display = 'block';
+            }
+        }
+
+        async function executeTeacherAction() {
+            const action = document.getElementById('teacherAction').value;
+            const topicName = document.getElementById('teacherTopicName').value;
+            const teacherResponseDiv = document.getElementById('teacherResponse');
+            teacherResponseDiv.innerHTML = 'Executing teacher action...';
+            teacherResponseDiv.classList.remove('error');
+
+            updateSessionTopics(); // Ensure sessionTopics are up-to-date
+
+            let payload = {
+                topic_name: topicName,
+            };
+
+            if (action === 'explain_topic') {
+                payload.level = document.getElementById('teacherLevel').value;
+            } else if (action === 'give_examples') {
+                payload.count = parseInt(document.getElementById('teacherCount').value);
+            } else if (action === 'explain_today') {
+                payload.today_iso = document.getElementById('teacherToday').value || null;
+                delete payload.topic_name;
+            }
+
+            let sessionState = {
+                topics: sessionTopics,
+            };
+
+            if (currentStudyPlan) {
+                sessionState.plan = currentStudyPlan;
+            }
+
+            const requestBody = {
+                action: action,
+                payload: payload,
+                session_state: sessionState,
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/teacher/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = typeof errorData.detail === 'string'
+                        ? errorData.detail
+                        : (typeof errorData.reason === 'string'
+                            ? errorData.reason
+                            : JSON.stringify(errorData.detail || errorData.reason || errorData));
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                teacherResponseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error executing teacher action:', error);
+                teacherResponseDiv.textContent = `Error: ${error.message}`;
+                teacherResponseDiv.classList.add('error');
+            }
+        }
+
+        // Initialize form fields for teacher mode
+        toggleTeacherFormFields();
+        // Show planner tab by default
+        showTab('planner');
+    </script>
+</body>
+
+</html>

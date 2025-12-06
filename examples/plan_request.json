@@ -1,34 +1,25 @@
 {
-    "start_date": "2025-12-01",
-    "exam_date": "2025-12-21",
-    "hours_per_day": 3.5,
+    "start_date": "2025-11-26",
+    "exam_date": "2025-12-26",
+    "hours_per_day": 4,
     "topics": [
         {
-            "subject_name": "DBMS",
-            "topic_name": "Normalization",
-            "difficulty": "hard",
+            "subject_name": "Mathematics",
+            "topic_name": "Algebra Basics",
+            "difficulty": "easy",
             "weight": "high",
             "weakness": "weak",
             "progress": 0.2,
-            "base_hours": 4.5
+            "base_hours": 10
         },
         {
-            "subject_name": "DBMS",
-            "topic_name": "ER Diagrams",
+            "subject_name": "Physics",
+            "topic_name": "Mechanics",
             "difficulty": "medium",
-            "weight": "medium",
+            "weight": "high",
             "weakness": "moderate",
             "progress": 0.5,
-            "base_hours": 3
-        },
-        {
-            "subject_name": "DSA",
-            "topic_name": "Arrays",
-            "difficulty": "easy",
-            "weight": "medium",
-            "weakness": "strong",
-            "progress": 0.8,
-            "base_hours": 2.5
+            "base_hours": 15
         }
     ]
 }

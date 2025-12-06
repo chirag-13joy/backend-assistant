@@ -1,0 +1,40 @@
+{
+    "kind": "topic_explanation",
+    "topic_name": "Algebra Basics",
+    "subject_name": "Mathematics",
+    "level": "default",
+    "summary": "A foundational area of mathematics where letters and symbols are used to represent numbers in equations.",
+    "why_important": "It is the basis for almost all higher-level mathematics and is critical for problem-solving in many fields.",
+    "student_status": {
+        "difficulty": "easy",
+        "weight": "high",
+        "weakness": "weak",
+        "progress_comment": "You've started, but there's a lot of ground to cover."
+    },
+    "main_ideas": [
+        {
+            "title": "Variables and Constants",
+            "description": "Understanding the difference between symbols that represent fixed values (constants) and those that can change (variables)."
+        },
+        {
+            "title": "Solving Equations",
+            "description": "Techniques for finding the value of an unknown variable that makes an equation true."
+        }
+    ],
+    "recommended_study_plan": [
+        {
+            "step": 1,
+            "title": "Review Core Concepts",
+            "description": "Go over the definitions of variables, constants, expressions, and equations."
+        },
+        {
+            "step": 2,
+            "title": "Practice Problems",
+            "description": "Work through a variety of practice problems, starting with simple one-step equations and moving to more complex ones."
+        }
+    ],
+    "warnings": [
+        "Don't forget to check your answers by plugging them back into the original equation."
+    ],
+    "tone": "direct"
+}

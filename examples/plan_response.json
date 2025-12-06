@@ -1,20 +1,28 @@
 {
-    "plan_id": "plan456",
-    "user_id": "user123",
-    "title": "10-Hour Physics & Math Study Plan",
-    "estimated_duration_hours": 10,
-    "modules": [
+    "days": [
         {
-            "module_title": "Physics: Kinematics",
-            "description": "Review of motion in one and two dimensions.",
-            "estimated_time_minutes": 120,
-            "resources": ["Textbook Chapter 2", "Online Lecture 1"]
-        },
-        {
-            "module_title": "Mathematics: Calculus Basics",
-            "description": "Introduction to derivatives and integrals.",
-            "estimated_time_minutes": 240,
-            "resources": ["Textbook Chapter 3", "Khan Academy Videos"]
+            "date": "2025-11-26",
+            "tasks": [
+                {
+                    "topic_name": "Algebra Basics",
+                    "subject_name": "Mathematics",
+                    "task_type": "theory",
+                    "duration_hours": 3.2,
+                    "priority_score": 0.8
+                },
+                {
+                    "topic_name": "Algebra Basics",
+                    "subject_name": "Mathematics",
+                    "task_type": "practice",
+                    "duration_hours": 0.8,
+                    "priority_score": 0.8
+                }
+            ],
+            "total_hours": 4
         }
-    ]
+    ],
+    "start_date": "2025-11-26",
+    "exam_date": "2025-12-26",
+    "hours_per_day": 4,
+    "status": "realistic"
 }

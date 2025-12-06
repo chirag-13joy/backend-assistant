@@ -1,0 +1,20 @@
+{
+  "topic": "Normalization",
+  "definition": "Normalization is the process of organizing columns (attributes) and tables (relations) of a relational database to minimize data redundancy.",
+  "steps": [
+    "First Normal Form (1NF)",
+    "Second Normal Form (2NF)",
+    "Third Normal Form (3NF)"
+  ],
+  "examples": [
+    {
+      "concept": "1NF",
+      "explanation": "Each table cell should contain a single value, and each record needs to be unique."
+    },
+    {
+      "concept": "2NF",
+      "explanation": "It should meet all the requirements of 1NF and there must be no partial dependency of any column on the primary key."
+    }
+  ],
+  "check_question": "What is the main purpose of normalization in a database?"
+}
